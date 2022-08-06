@@ -2,7 +2,7 @@
 aws_cluster_name = "k8-deployment"
 
 AWS_DEFAULT_REGION = "us-east-1"
-AWS_SSH_KEY_NAME = "voc-key"
+AWS_SSH_KEY_NAME = "vockey"
 
 #VPC Vars
 aws_vpc_cidr_block       = "10.250.192.0/18"
