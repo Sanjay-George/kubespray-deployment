@@ -1,5 +1,5 @@
 #Global Vars
-aws_cluster_name = "k8-deployment"
+aws_cluster_name = "k8-no-bast"
 
 AWS_DEFAULT_REGION = "us-east-1"
 AWS_SSH_KEY_NAME = "vockey"

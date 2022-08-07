@@ -68,13 +68,13 @@ resource "aws_instance" "bastion-server" {
   }))
 }
 
-# Associate existing Elastic IP for bastion server
-resource "aws_eip_association" "bastion_host_eip_assoc" {
-  # TODO: Attaching elastic IP only on first bastion host (first AZ). 
-  #       Expand to all bastion hosts for H.A.
-  instance_id   = aws_instance.bastion-server[0].id
-  allocation_id = data.aws_eip.bastion_host_elastic_ip.id
-}
+# # Associate existing Elastic IP for bastion server
+# resource "aws_eip_association" "bastion_host_eip_assoc" {
+#   # TODO: Attaching elastic IP only on first bastion host (first AZ). 
+#   #       Expand to all bastion hosts for H.A.
+#   instance_id   = aws_instance.bastion-server[0].id
+#   allocation_id = data.aws_eip.bastion_host_elastic_ip.id
+# }
 
 /*
 * Create K8s Master and worker nodes and etcd instances
@@ -87,7 +87,11 @@ resource "aws_instance" "k8s-master" {
 
   count = var.aws_kube_master_num
 
-  subnet_id = element(module.aws-vpc.aws_subnet_ids_private, count.index)
+  // subnet_id = element(module.aws-vpc.aws_subnet_ids_private, count.index)
+
+  # TODO: remove below 2 lines once bastion host is configured.
+  associate_public_ip_address = true
+  subnet_id = element(module.aws-vpc.aws_subnet_ids_public, count.index)
 
   vpc_security_group_ids = module.aws-vpc.aws_security_group
 
@@ -118,7 +122,11 @@ resource "aws_instance" "k8s-etcd" {
 
   count = var.aws_etcd_num
 
-  subnet_id = element(module.aws-vpc.aws_subnet_ids_private, count.index)
+  # subnet_id = element(module.aws-vpc.aws_subnet_ids_private, count.index)
+
+  # TODO: remove below 2 lines once bastion host is configured.
+  associate_public_ip_address = true
+  subnet_id = element(module.aws-vpc.aws_subnet_ids_public, count.index)
 
   vpc_security_group_ids = module.aws-vpc.aws_security_group
 
@@ -141,7 +149,11 @@ resource "aws_instance" "k8s-worker" {
 
   count = var.aws_kube_worker_num
 
-  subnet_id = element(module.aws-vpc.aws_subnet_ids_private, count.index)
+  # subnet_id = element(module.aws-vpc.aws_subnet_ids_private, count.index)
+
+  # TODO: remove below 2 lines once bastion host is configured.
+  associate_public_ip_address = true
+  subnet_id = element(module.aws-vpc.aws_subnet_ids_public, count.index)
 
   vpc_security_group_ids = module.aws-vpc.aws_security_group
 
@@ -178,9 +190,9 @@ data "template_file" "inventory" {
     nlb_api_fqdn              = "apiserver_loadbalancer_domain_name=\"${module.aws-nlb.aws_nlb_api_fqdn}\""
   }
 
-  depends_on = [
-    aws_eip_association.bastion_host_eip_assoc
-  ]
+  # depends_on = [
+  #   aws_eip_association.bastion_host_eip_assoc
+  # ]
 }
 
 resource "null_resource" "inventories" {
