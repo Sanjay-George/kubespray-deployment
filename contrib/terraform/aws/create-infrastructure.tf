@@ -160,7 +160,7 @@ data "template_file" "inventory" {
   template = file("${path.module}/templates/inventory.tpl")
 
   vars = {
-    public_ip_address_bastion = join("\n", formatlist("bastion ansible_host=%s", aws_instance.bastion-server.*.public_ip))
+    public_ip_address_bastion = join("\n", formatlist("bastion ansible_host=%s ansible_user=ubuntu", aws_instance.bastion-server.*.public_ip))
     connection_strings_master = join("\n", formatlist("%s ansible_host=%s", aws_instance.k8s-master.*.private_dns, aws_instance.k8s-master.*.private_ip))
     connection_strings_node   = join("\n", formatlist("%s ansible_host=%s", aws_instance.k8s-worker.*.private_dns, aws_instance.k8s-worker.*.private_ip))
     list_master               = join("\n", aws_instance.k8s-master.*.private_dns)
