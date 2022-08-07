@@ -114,7 +114,13 @@ resource "aws_security_group_rule" "allow-all-ingress" {
   from_port         = 0
   to_port           = 65535
   protocol          = "-1"
-  cidr_blocks       = [var.aws_vpc_cidr_block]
+  
+  # TODO: UNCOMMENT THIS. Incoming requests should come through LB, so set CIDR to that of VPC
+  # cidr_blocks       = [var.aws_vpc_cidr_block]
+
+  # TODO: remove once Ansible works
+  cidr_blocks       = ["0.0.0.0/0"]
+  
   security_group_id = aws_security_group.kubernetes.id
 }
 
