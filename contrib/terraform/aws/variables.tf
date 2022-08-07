@@ -14,6 +14,14 @@ variable "AWS_DEFAULT_REGION" {
   description = "AWS Region"
 }
 
+# ELastic IP for Bastion Host
+data "aws_eip" "bastion_host_elastic_ip" {
+  filter {
+    name   = "tag:Name"
+    values = ["k8_deployment_bastion_eip"]
+  }
+}
+
 //General Cluster Settings
 
 variable "aws_cluster_name" {
@@ -35,6 +43,7 @@ data "aws_ami" "distro" {
 
   owners = ["136693071363"] # Debian-10
 }
+
 
 //AWS VPC Variables
 

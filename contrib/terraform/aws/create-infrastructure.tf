@@ -68,6 +68,14 @@ resource "aws_instance" "bastion-server" {
   }))
 }
 
+# Associate existing Elastic IP for bastion server
+resource "aws_eip_association" "bastion_host_eip_assoc" {
+  # TODO: Attaching elastic IP only on first bastion host (first AZ). 
+  #       Expand to all bastion hosts for H.A.
+  instance_id   = aws_instance.bastion-server[0].id
+  allocation_id = data.aws_eip.bastion_host_elastic_ip.id
+}
+
 /*
 * Create K8s Master and worker nodes and etcd instances
 *
@@ -169,6 +177,10 @@ data "template_file" "inventory" {
     list_etcd                 = join("\n", ((var.aws_etcd_num > 0) ? (aws_instance.k8s-etcd.*.private_dns) : (aws_instance.k8s-master.*.private_dns)))
     nlb_api_fqdn              = "apiserver_loadbalancer_domain_name=\"${module.aws-nlb.aws_nlb_api_fqdn}\""
   }
+
+  depends_on = [
+    aws_eip_association.bastion_host_eip_assoc
+  ]
 }
 
 resource "null_resource" "inventories" {
